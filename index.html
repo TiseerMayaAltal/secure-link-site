@@ -3,79 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <title>Secure File Downloader</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
     body {
-      background-color: #f9fafb;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      height: 100vh;
-      align-items: center;
-      justify-content: center;
-    }
-    .card {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 420px;
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
       text-align: center;
+      padding: 50px;
     }
+
+    .container {
+      background: white;
+      border-radius: 10px;
+      padding: 40px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
     h1 {
-      margin-bottom: 1rem;
-      font-size: 1.5rem;
-      color: #111827;
+      font-size: 24px;
+      margin-bottom: 20px;
     }
-    input {
-      padding: 10px;
-      width: 100%;
-      margin-bottom: 1rem;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 1rem;
+
+    input[type="text"] {
+      width: 90%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
+
     button {
-      background-color: #2563eb;
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #1f4cf5;
       color: white;
       border: none;
-      padding: 10px 20px;
-      font-size: 1rem;
-      border-radius: 8px;
+      border-radius: 5px;
       cursor: pointer;
     }
+
     button:hover {
-      background-color: #1e40af;
+      background-color: #163cc0;
     }
+
     #result {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-    }
-    .copy-btn {
-      background: none;
-      border: none;
-      color: #2563eb;
-      cursor: pointer;
-      margin-left: 10px;
+      margin-top: 20px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <div class="card">
+  <div class="container">
     <h1>🔐 Secure One-Time Link</h1>
-    <input id="fileKey" placeholder="Enter file name (e.g. Cloud-proposal.docx)" />
+    <input type="text" id="filename" placeholder="Cloud-proposal.docx" />
     <button onclick="generateLink()">Generate Link</button>
-    <p id="result"></p>
+    <div id="result"></div>
   </div>
 
   <script>
     async function generateLink() {
-      const fileKey = document.getElementById("fileKey").value.trim();
+      const fileKey = document.getElementById("filename").value.trim();
       const result = document.getElementById("result");
 
       if (!fileKey) {
@@ -88,8 +77,12 @@
       try {
         const response = await fetch("https://4y3p1rcnne.execute-api.eu-north-1.amazonaws.com/prod/generate", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ file_key: fileKey })
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            file_key: fileKey
+          })
         });
 
         const data = await response.json();
@@ -97,13 +90,11 @@
         if (!data.download_url) {
           result.innerHTML = "❌ Failed to generate. Check file name or server.";
         } else {
-          result.innerHTML = `
-            ✅ <a href="${data.download_url}" target="_blank">Click here to download</a>
-            <button class="copy-btn" onclick="navigator.clipboard.writeText('${data.download_url}')">📋 Copy</button>
-          `;
+          result.innerHTML = `<a href="${data.download_url}" target="_blank">✅ Click here to download</a>`;
         }
       } catch (err) {
         result.innerHTML = "❌ Error contacting server.";
+        console.error(err);
       }
     }
   </script>
